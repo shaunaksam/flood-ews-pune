@@ -1,0 +1,7 @@
+# Placeholder — services will be added here as each milestone builds them out.
+# version: "3.9"
+# services:
+#   risk-engine:
+#     build: ./risk-engine
+#   api:
+#     build: ./api
