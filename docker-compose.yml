@@ -1,7 +1,15 @@
-# Placeholder — services will be added here as each milestone builds them out.
-# version: "3.9"
-# services:
-#   risk-engine:
-#     build: ./risk-engine
-#   api:
-#     build: ./api
+services:
+  db:
+    image: timescale/timescaledb-ha:pg16
+    container_name: flood_ews_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flood_ews
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
