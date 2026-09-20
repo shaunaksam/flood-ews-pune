@@ -24,6 +24,7 @@ executing==2.2.1
 fastjsonschema==2.22.2
 fonttools==4.64.0
 fqdn==1.5.1
+GeoAlchemy2==0.20.0
 geopandas==1.1.4
 greenlet==3.5.6
 h11==0.16.0
