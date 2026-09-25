@@ -23,8 +23,8 @@ and demo dates. Status: **M0 (Discovery & Feasibility) complete — M1 in progre
 | Milestone | Status |
 |---|---|
 | M0 — Discovery & Feasibility | Completed |
-| M1 — Data Foundation & Ward-Level Risk Engine | Not Started |
-| M2 — River-Corridor Model & Database Layer | Not Started |
+| M1 — Data Foundation & Ward-Level Risk Engine | Completed |
+| M2 — River-Corridor Model & Database Layer | Completed |
 | M3 — API Layer & Alerting | Not Started |
 | M4 — Citizen & Authority Dashboard | Not Started |
 | M5 — Containerization & Pilot Deployment | Not Started |
