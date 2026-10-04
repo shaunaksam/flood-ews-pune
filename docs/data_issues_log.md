@@ -54,3 +54,11 @@ Loaded all three tables into PostgreSQL: wards (58 rows, with geometry via to_po
 Corridor threshold rule (25,000 cusecs) correctly flags wards 52 and 35, both directly named in dated, sourced flood events. Ward 34 (Bhimnagar/Kondhwe Dhawade) does not appear, since no specific dated event in the sourced POC table names it explicitly — it was only present in the general locality list, not tied to a confirmed dated event. Not treated as a bug: the corridor rule is intentionally scoped to directly-evidenced wards only. Ward 34 remains represented in the overall risk_score via elevation and river-distance features.
 
 Built minimal FastAPI service exposing two endpoints (GET /risk/city, GET /risk/wards), reading live from PostgreSQL. Verified working via interactive docs (/docs) — correctly returns city-wide composite score and ranked ward scores, with corridor-discharge override triggering correctly at threshold.
+
+Risk-score saturation bug (rain alone hitting 1.0, indistinguishable from a real corridor event) → fixed with a 0.95 non-flagged ceiling, reserving 1.0 exclusively for confirmed discharge events
+
+2019 flood replay: real rainfall was 204.6mm over 3 days (not a single-day spike), discharge was only 13,891 cusecs — below your 25,000 threshold — model still correctly flags the city as critical, but through the rainfall channel, not the corridor rule. Two independent validations now, not one.
+
+Static vulnerability vs. live risk split — separated a ward's permanent structural risk from its current conditions, so a calm day doesn't look like an active emergency
+
+Dashboard slider clamping silently rounds out-of-range values rather than erroring — worth knowing as a general UI gotcha

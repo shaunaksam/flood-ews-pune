@@ -11,5 +11,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7
+    container_name: flood_ews_redis
+    ports:
+      - "6379:6379"
+
 volumes:
   pgdata:
