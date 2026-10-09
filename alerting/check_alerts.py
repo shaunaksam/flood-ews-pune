@@ -29,12 +29,15 @@ def check_and_queue_alerts():
         print("No wards currently critical beyond baseline, nothing queued.")
 
 if __name__ == "__main__":
-   
     print("--- Calm conditions check ---")
     check_and_queue_alerts()
 
-    print("\n--- Simulated high-discharge test ---")
+    print("\n--- Simulated high-discharge test (not a real condition) ---")
     wards = compute_risk(30000, 205)
     wards["risk_rise"] = wards["risk_score"] - wards["static_vulnerability"]
     critical = wards[(wards["risk_score"] >= CRITICAL_THRESHOLD) & (wards["risk_rise"] >= MIN_RISE_ABOVE_BASELINE)]
-    print(critical[["name", "risk_score", "static_vulnerability"]])
+
+    for _, ward in critical.iterrows():
+        message = f"ALERT: {ward['name']} at risk score {round(ward['risk_score'], 3)} (baseline {round(ward['static_vulnerability'], 3)})"
+        r.lpush("flood_alerts", message)
+        print("Queued:", message)
