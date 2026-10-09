@@ -61,4 +61,10 @@ Risk-score saturation bug (rain alone hitting 1.0, indistinguishable from a real
 
 Static vulnerability vs. live risk split — separated a ward's permanent structural risk from its current conditions, so a calm day doesn't look like an active emergency
 
-Dashboard slider clamping silently rounds out-of-range values rather than erroring — worth knowing as a general UI gotcha
+Dashboard slider clamping silently rounds out-of-range values rather than erroring
+
+Fixed alerting bug: static baseline alone (e.g. ward 32's 0.915) was triggering alerts even at zero live conditions. Fixed by requiring risk_score to exceed static_vulnerability by a minimum margin before queuing.
+
+Full alerting pipeline proven end-to-end: risk model → Redis queue → worker delivery, tested and confirmed working.
+
+Set up Node/Express backend (api-node/), confirmed it can successfully proxy requests to the Python risk API.
