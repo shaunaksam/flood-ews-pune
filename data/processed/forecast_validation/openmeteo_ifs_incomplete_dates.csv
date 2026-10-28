@@ -1,0 +1,4 @@
+target_date,run_utc,reason,recorded_at_local
+2025-08-06,2025-08-04T12:00,Incomplete hourly coverage: calendar matched=[0]; IMD-window matched=[0]. No forecast rows were saved for this date.,2026-10-23T21:12:30+05:30
+2025-08-08,2025-08-06T12:00,Incomplete hourly coverage: calendar matched=[0]; IMD-window matched=[0]. No forecast rows were saved for this date.,2026-10-23T21:12:31+05:30
+2025-08-09,2025-08-07T12:00,Incomplete hourly coverage: calendar matched=[0]; IMD-window matched=[0]. No forecast rows were saved for this date.,2026-10-23T21:12:31+05:30

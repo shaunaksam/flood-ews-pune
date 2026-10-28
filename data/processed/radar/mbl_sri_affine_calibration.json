@@ -1,0 +1,49 @@
+{
+  "radar_file": "C:\\Users\\shaun\\Downloads\\flood-ews-repo\\data\\raw\\radar\\mbl_sri_check2.gif",
+  "ward_file": "C:\\Users\\shaun\\Downloads\\flood-ews-repo\\data\\raw\\pune_wards.geojson",
+  "method": "approximate affine fit using four town-centre anchors",
+  "anchors": [
+    {
+      "name": "Pune",
+      "latitude": 18.515797,
+      "longitude": 73.856605,
+      "clicked_pixel_x": 318,
+      "clicked_pixel_y": 251,
+      "fit_residual_km": 11.898299457857936
+    },
+    {
+      "name": "Lonavala",
+      "latitude": 18.73059,
+      "longitude": 73.426861,
+      "clicked_pixel_x": 267,
+      "clicked_pixel_y": 208,
+      "fit_residual_km": 13.48595598075895
+    },
+    {
+      "name": "Shirur",
+      "latitude": 18.825649,
+      "longitude": 74.375023,
+      "clicked_pixel_x": 397,
+      "clicked_pixel_y": 276,
+      "fit_residual_km": 20.949766530291853
+    },
+    {
+      "name": "Baramati",
+      "latitude": 18.182669,
+      "longitude": 74.597219,
+      "clicked_pixel_x": 439,
+      "clicked_pixel_y": 308,
+      "fit_residual_km": 19.362110007426907
+    }
+  ],
+  "longitude_coefficients": [
+    0.005677762390970968,
+    0.0020575191534809023,
+    71.5104037913376
+  ],
+  "latitude_coefficients": [
+    0.009830788194047693,
+    -0.02186914595821856,
+    20.77366855267009
+  ]
+}

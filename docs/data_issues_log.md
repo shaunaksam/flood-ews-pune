@@ -68,3 +68,6 @@ Fixed alerting bug: static baseline alone (e.g. ward 32's 0.915) was triggering 
 Full alerting pipeline proven end-to-end: risk model → Redis queue → worker delivery, tested and confirmed working.
 
 Set up Node/Express backend (api-node/), confirmed it can successfully proxy requests to the Python risk API.
+
+[REDACTED_TELEGRAM_TOKEN]
+

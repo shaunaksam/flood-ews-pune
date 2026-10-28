@@ -1,0 +1,2 @@
+target_date,run_utc,reason,recorded_at_local
+2025-08-10,2025-08-08T12:00,Open-Meteo archive has no ecmwf_ifs run at 2025-08-08T12:00 (HTTP 400).,2026-10-23T17:36:33+05:30

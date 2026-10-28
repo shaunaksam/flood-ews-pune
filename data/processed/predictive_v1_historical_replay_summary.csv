@@ -1,0 +1,3 @@
+rainfall_input_mode,days,days_with_any_ward_priority,pct_days_with_any_ward_priority,days_with_any_high_or_critical_ward,days_with_any_critical_ward,mean_city_average_index,max_city_index,max_priority_wards_on_a_day,max_high_critical_wards_on_a_day
+central_grid_cell,1826,24,1.31,7,5,0.0186,1.0,57,50
+nine_cell_regional_mean,1826,22,1.2,4,1,0.0244,0.9209,56,47
