@@ -10,3 +10,5 @@ node_modules/
 data/raw/discharge/
 data/raw/rainfall_tel_hr_maharashtra_sw_mh_2021_2025.csv
 .venv/
+
+data/raw/groundsource_2026.parquet

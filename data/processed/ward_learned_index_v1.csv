@@ -1,0 +1,59 @@
+wardnum,name,km2,vuln,terrain,river,learned_probability_on_a_30mm_day,learned_rank_pct,hand_rank_pct
+1,Dhanori - Vishrantwadi,13.0639,0.3639,0.0165,0.0045,0.195,0.534,0.379
+2,Tingrenagar - Sanjay Park,6.0485,0.388,0.0183,0.0049,0.2133,0.638,0.483
+3,Lohegaon - Vimannagar,31.7369,0.3349,0.016,0.0037,0.1877,0.517,0.276
+4,East Kharadi - Wagholi,35.5646,0.3077,0.0154,0.0017,0.1839,0.466,0.207
+5,West Kharadi - Vadgaon Sheri,4.0911,0.3569,0.0128,0.0027,0.1722,0.379,0.328
+6,Vadgaon Sheri - Ramwadi,3.3591,0.3897,0.0137,0.0041,0.1809,0.431,0.517
+7,Kalyaninagar - Nagpur Chawl,6.8928,0.431,0.0217,0.0059,0.2494,0.759,0.672
+8,Kalas - Phulenagar,4.032,0.4449,0.0198,0.0065,0.2337,0.707,0.724
+9,Yerwada,1.1509,0.4504,0.0223,0.0068,0.2564,0.845,0.759
+10,Shivajinagar Gaothan - Sangamwadi,7.4014,0.4974,0.0241,0.0087,0.2784,1.0,0.948
+11,Bopodi - Savitribai Phule Pune University,7.1048,0.4459,0.0195,0.0072,0.2288,0.69,0.741
+12,Aundh - Balewadi,12.2337,0.418,0.0171,0.006,0.2066,0.603,0.638
+13,Baner - Sus - Mahalunge,20.8185,0.3808,0.0126,0.0063,0.165,0.293,0.448
+14,Pashan - Bawdhan,19.1546,0.3994,0.0126,0.0087,0.1617,0.207,0.569
+15,Gokhalenagar - Vadarwadi,4.7816,0.3901,0.0126,0.0076,0.1631,0.259,0.534
+16,Fergusson College - Erandwane,5.8059,0.4814,0.0232,0.0087,0.2654,0.897,0.845
+17,Shaniwar peth - Navi Peth,2.2781,0.4905,0.0237,0.0087,0.2727,0.931,0.879
+18,Shaniwarwada - Kasba Peth,1.0968,0.4948,0.0239,0.0087,0.2758,0.966,0.914
+19,Chhatrapati Shivaji Maharaj Stadium - Rasta peth,1.0325,0.4925,0.0239,0.0086,0.2755,0.948,0.897
+20,Pune Station -Matoshri Ramabai Ambedkar Road,4.1719,0.496,0.024,0.0087,0.2771,0.983,0.931
+21,Koregaon park - Mundhwa,8.3259,0.4689,0.0231,0.0074,0.2664,0.914,0.81
+22,Manjari Bk. - Shewalwadi,31.3161,0.3494,0.0127,0.0022,0.1716,0.362,0.31
+23,Sadesataranali - Aakashwani,7.1618,0.3404,0.0124,0.0022,0.1678,0.345,0.293
+24,Magarpatta - Sadhana Vidyalaya,5.2955,0.3807,0.0133,0.0041,0.1763,0.397,0.431
+25,Hadapsar Gaothan - Satavwadi,1.8463,0.331,0.0119,0.0025,0.1618,0.224,0.241
+26,Wanwadi Gaothan - Vaiduwadi,4.558,0.3731,0.0189,0.0048,0.2151,0.655,0.414
+27,Kasewadi - Lohiyanagar,0.9434,0.4427,0.0217,0.0072,0.2474,0.741,0.707
+29,Ghorpade peth Udyan - Mahatma Phule Mandai,1.2473,0.4613,0.0223,0.0081,0.2541,0.81,0.776
+30,Jai Bhavaninagar - Kelewadi,3.0956,0.3865,0.0124,0.0078,0.1605,0.19,0.466
+31,Kothrud Gaothan - Shivtirthnagar,1.8426,0.4185,0.0138,0.0072,0.178,0.414,0.655
+32,Bhusari colony - Bavdhan Khurd,4.554,0.4022,0.0127,0.0087,0.1629,0.241,0.586
+33,Ideal colony - Mahatma Society,8.6032,0.3951,0.0124,0.0087,0.1596,0.155,0.552
+34,Warje - Kondhave Dhavde,27.9468,0.9147,0.0153,0.0218,0.2535,0.776,1.0
+35,Ramnagar - Uttamnagar Shivane,4.6804,0.7243,0.0179,0.0153,0.2535,0.793,0.966
+36,Karvenagar,2.6271,0.4826,0.0158,0.0087,0.2016,0.586,0.862
+37,Janata Vasahat - Dattawadi,1.8138,0.4698,0.0225,0.0087,0.2558,0.828,0.828
+38,Shivdarshan - Padmavati,2.7423,0.439,0.0211,0.008,0.238,0.724,0.69
+39,Market yard - Maharshinagar,2.7042,0.4091,0.02,0.0069,0.2253,0.672,0.603
+40,Bibvewadi - Gangadham,4.9426,0.3576,0.0179,0.0064,0.1982,0.552,0.345
+41,Kondhva Kh - Mithanagar,1.9532,0.2746,0.014,0.0044,0.1599,0.172,0.121
+42,Ramtekadi - Sayyadnagar,8.0736,0.3069,0.0163,0.0036,0.1844,0.483,0.19
+43,Wanawadi - Kausar Baug,4.1534,0.3236,0.0163,0.0043,0.1857,0.5,0.224
+44,Kale Boratenagar - Sasanenagar,3.5046,0.3011,0.011,0.0017,0.1528,0.121,0.155
+45,Fursungi,6.5052,0.2619,0.0101,0.0,0.1449,0.103,0.086
+46,Mohammad wadi - Uruli Devachi,44.5728,0.238,0.0117,0.0029,0.1431,0.086,0.052
+47,Kondhva Bk - Yewalewadi,17.1983,0.1896,0.0093,0.0038,0.1201,0.052,0.034
+48,Upper Super Indiranagar,1.5019,0.2937,0.0147,0.0053,0.1655,0.31,0.138
+49,Balajinagar - Shankar Maharaj Math,1.4924,0.3666,0.0177,0.0065,0.1983,0.569,0.397
+50,Sahakarnagar - Taljai,2.8637,0.3888,0.019,0.0079,0.2088,0.621,0.5
+51,Vadgaon Bk - Manikbaug,6.0713,0.4096,0.0151,0.0085,0.1816,0.448,0.621
+52,Nanded City - Sun City,6.2265,0.7339,0.0183,0.0153,0.2597,0.879,0.983
+53,Khadakwasla - Narhe,28.8544,0.3312,0.0115,0.0087,0.1428,0.069,0.259
+54,Dhayari - Ambegaon,26.2487,0.2429,0.0082,0.0072,0.1148,0.034,0.069
+55,Dhankawadi - Ambegaon Pathar,3.537,0.3635,0.0134,0.0075,0.1637,0.276,0.362
+56,Chaitanyanagar - Bharati Vidyapeeth,1.9895,0.3026,0.0148,0.0061,0.1656,0.328,0.172
+57,Sukhsagarnagar - Rajiv Gandhinagar,2.864,0.2719,0.0135,0.0051,0.1543,0.138,0.103
+58,Katraj - Gokulnagar,20.4105,0.1154,0.0043,0.005,0.0862,0.017,0.017
+28,Mahatma Phule Smarak –Bhavani Peth,0.8177,0.4634,0.0226,0.0078,0.2586,0.862,0.793

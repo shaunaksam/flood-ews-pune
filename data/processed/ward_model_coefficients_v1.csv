@@ -1,0 +1,14 @@
+feature,standardized_weight
+rx,0.458
+y2025,0.453
+y2024,0.318
+rm,0.224
+rm_terrain,0.201
+larea,0.153
+rm_vuln,0.127
+y2023,-0.105
+rm_larea,0.084
+terrain,0.057
+vuln,0.053
+river,-0.048
+rm_river,-0.017

@@ -94,7 +94,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
 .mapHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .mapHead .eyebrow{margin:0}
 .seg{display:inline-flex;background:var(--track);border-radius:999px;padding:3px}
-.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:650;padding:7px 14px;border-radius:999px;cursor:pointer;transition:background .35s var(--ease),color .35s}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:650;padding:7px 11px;white-space:nowrap;border-radius:999px;cursor:pointer;transition:background .35s var(--ease),color .35s}
 .seg button.on{background:var(--ink);color:var(--paper)}
 .mapBox{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:1000/860;background:radial-gradient(110% 90% at 50% 0%,#16262f 0%,#0a1219 72%);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 0 60px rgba(0,0,0,.4);touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .mapBox svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
@@ -124,6 +124,11 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
 .mapTag[hidden]{display:none}
 .mapMsg{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:#9fb2c0;font-size:15px}
 .mapMsg[hidden]{display:none}
+.repBar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:14px;color:var(--muted)}
+.repBar a{color:var(--tint);font-weight:650;white-space:nowrap}
+#repG circle.pin{stroke:#fff;stroke-width:1.6;vector-effect:non-scaling-stroke}
+#repG circle.ring{fill:none;stroke-width:1.4;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:ringPulse 2.4s ease-out infinite}
+@keyframes ringPulse{from{transform:scale(1);opacity:.85}to{transform:scale(3.2);opacity:0}}
 .wardPanel{margin-top:14px;padding:16px 18px 18px;border-radius:20px;background:var(--track);min-height:70px}
 .wardPanel .hint{color:var(--muted);font-size:15px}
 .wardPanel .ph{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -136,11 +141,11 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
 .bar i{display:block;height:100%;width:0;border-radius:6px;transition:width 1s var(--ease),background .6s}
 .swapIn{animation:swapIn .5s var(--ease) both}
 @keyframes swapIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.w,.mePulse,.swapIn{animation:none}.bar i,#labelsG,.w{transition:none}}
+@media (prefers-reduced-motion:reduce){.w,.mePulse,.swapIn,#repG circle.ring{animation:none}.bar i,#labelsG,.w{transition:none}}
 .foot{margin:26px 4px 0;text-align:center;color:var(--muted);font-size:13px}
 .js .reveal{opacity:0;transform:translateY(18px)}
 .js .reveal.in{opacity:1;transform:none;transition:opacity .8s ease,transform .9s var(--ease)}
-@media (max-width:420px){.card{padding:20px 18px;border-radius:26px}.gv{font-size:32px}.legend{left:8px;bottom:8px;padding:6px 8px 7px;font-size:10.5px}.legend .lbar{width:84px}.mapBtns{right:8px;top:8px}.mapBtns button{width:34px;height:34px}}
+@media (max-width:420px){.card{padding:20px 18px;border-radius:26px}.gv{font-size:32px}.legend{left:8px;bottom:8px;padding:6px 8px 7px;font-size:10.5px}.legend .lbar{width:84px}.seg button{padding:7px 10px;font-size:12.5px;white-space:nowrap}.mapBtns{right:8px;top:8px}.mapBtns button{width:34px;height:34px}}
 @media (prefers-reduced-motion:reduce){.wave{animation:none}#water,.tube i,body,.hero,.orbBg,.chip,.chip i{transition:none}.js .reveal,.js .reveal.in{opacity:1;transform:none;transition:none}}
 </style>
 </head>
@@ -176,6 +181,12 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     <div class="chips"><span class="chip" id="bandChip"><i></i><span id="bandText">Checking</span></span><span class="chip plain" id="metaChip"></span><button class="chip plain" id="refreshBtn" type="button">↻ Refresh</button></div>
   </section>
 
+  <section class="card reveal" id="obsCard" hidden>
+    <p class="eyebrow">Rain recorded · last 24 hours</p>
+    <div id="obsRows"></div>
+    <p class="note" id="obsNote"></p>
+  </section>
+
   <section class="card reveal">
     <p class="eyebrow">Expected rain · Pune average</p>
     <div class="gauges">
@@ -188,7 +199,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
   <section class="card reveal" id="mapCard">
     <div class="mapHead">
       <p class="eyebrow">Risk map</p>
-      <div class="seg" role="group" aria-label="Map view"><button type="button" class="on" data-mode="now">Right now</button><button type="button" data-mode="base">Always vulnerable</button></div>
+      <div class="seg" role="group" aria-label="Map view"><button type="button" class="on" data-mode="now">Right now</button><button type="button" data-mode="base">Always vulnerable</button><button type="button" data-mode="learned">From reports</button></div>
     </div>
     <div class="mapBox" id="mapBox">
       <svg id="mapSvg" viewBox="0 0 1000 860" role="img" aria-label="Map of Pune wards coloured by flood-risk index. Use the ward selector for keyboard access."></svg>
@@ -198,6 +209,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
       <div class="tip" id="mapTip" hidden></div>
       <div class="mapMsg" id="mapMsg">Loading map…</div>
     </div>
+    <div class="repBar"><span id="repText">Checking citizen reports…</span><a id="repLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Report on Telegram ↗</a></div>
     <div class="wardPanel" id="wardPanel" aria-live="polite"><p class="hint">Hover or tap a ward to see its risk.</p></div>
     <p class="note" id="mapNote">Colours show a model-estimated advisory index, not an official flood map. Ctrl + scroll or the + / − buttons zoom the map.</p>
   </section>
@@ -334,6 +346,21 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     } else {
       headline = "Outlook unavailable"; sub = "No estimate right now. Please check official IMD updates."; tint = "none"; chip = "No estimate"; tips = "none";
     }
+    const ob = OBS.stations.reduce((a, s) => !a || s.mm > a.mm ? s : a, null);
+    if (ob && ob.mm >= 15 && (tint === "Low" || tint === "none")) {
+      const heavy = ob.mm >= 30;
+      headline = heavy ? "Heavy rain has fallen" : "Rain has fallen";
+      sub = ob.station + " recorded " + ob.mm.toFixed(1) + " mm in the last 24 hours. " + (heavy ? "Expect waterlogging and slow traffic." : "Roads may be wet in places.");
+      chip = heavy ? "Heavy rain recorded" : "Rain recorded";
+      tint = ob.mm >= 60 ? "High" : heavy ? "Watch" : "Low";
+      tips = tint === "none" ? "Low" : tint;
+    }
+    const rr = REP.rainRecent;
+    if (rr && rr.people >= 3 && rr.wards >= 2 && (tint === "Low" || tint === "none") && headline !== "Heavy rain has fallen" && headline !== "Rain has fallen") {
+      headline = "Residents report heavy rain";
+      sub = rr.people + " residents in " + rr.wards + " wards report steady or heavy rain in the last 90 minutes. Unverified, and not in the forecast.";
+      chip = "Resident reports"; tint = "Watch"; tips = "Watch";
+    }
     return {headline, sub, tint, chip, tips, pct, p: hc ? hc.probability : null, aria: "Chance of heavy rain in the next 24 hours: " + label};
   }
 
@@ -398,7 +425,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     applyHero(r ? replayHero(r) : liveHero());
     const t = timeOnly(state.fc && state.fc.inputs && state.fc.inputs.fetched_at_local);
     $("metaChip").textContent = r ? "Past day · nothing sent" : (t ? "Updated " + t : "");
-    renderGauges(); renderTech();
+    renderGauges(); renderTech(); renderReportBar(); drawReports(); renderObs();
   }
 
   function renderOfficial() {
@@ -446,6 +473,8 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
       state.wards = state.fc && Array.isArray(state.fc.wards) ? state.fc.wards : [];
       fillWards(); renderOfficial();
       if (!state.replay) loadMapScores();
+      loadReports();
+      loadObservations();
       if (!state.replay) render();
     } finally { btn.disabled = false; btn.textContent = "↻ Refresh"; }
   }
@@ -482,6 +511,10 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     els.forEach(e => io.observe(e));
   }
 
+  const OBS = {stations: [], source: ""};
+  const REP = {wards: {}, total: 0, bot: null, rain: {}, rainTotal: 0, rainRecent: {people: 0, wards: 0}};
+  const RAIN_WORDS = {1: "light rain", 2: "steady rain", 3: "heavy downpour"};
+  const REP_COLORS = {1: "#f2c14e", 2: "#f08a3c", 3: "#e5473d"};
   const MAP = {shape: null, scores: null, replay: false, mode: "now", sel: null, k: 1, tx: 0, ty: 0, W: 1000, H: 860, proj: null, paths: new Map(), bbox: new Map(), d: new Map(), promise: null, moved: false, me: null, note: ""};
   const NS = "http://www.w3.org/2000/svg";
   const RAMP = [[0, [24, 54, 66]], [0.15, [31, 93, 105]], [0.35, [224, 178, 82]], [0.6, [240, 138, 60]], [1, [229, 71, 61]]];
@@ -494,6 +527,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
   }
   const polysOf = g => g.type === "Polygon" ? [g.coordinates] : g.coordinates;
   const levelWord = (l, s) => l ? String(l).charAt(0).toUpperCase() + String(l).slice(1).toLowerCase() : (s === null || s === undefined ? "Unknown" : s < 0.2 ? "Low" : s < 0.4 ? "Guarded" : s < 0.6 ? "Elevated" : s < 0.8 ? "High" : "Severe");
+  const topWord = v => v === null || v === undefined ? "unknown" : "top " + Math.max(1, Math.round((1 - v) * 100)) + "%";
   const vulnWord = v => v === null || v === undefined ? "Unknown" : v < 0.34 ? "Low" : v < 0.67 ? "Moderate" : "High";
 
   function buildProjection(wards) {
@@ -516,7 +550,8 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     const hh = document.createElementNS(NS, "path"); hh.id = "hlHover";
     const lg = document.createElementNS(NS, "g"); lg.id = "labelsG";
     const mg = document.createElementNS(NS, "g"); mg.id = "meG";
-    vp.append(rg, wg, hs, hh, lg, mg); svg.append(vp);
+    const rp = document.createElementNS(NS, "g"); rp.id = "repG";
+    vp.append(rg, wg, hs, hh, lg, rp, mg); svg.append(vp);
     const wards = MAP.shape.wards;
     MAP.proj = buildProjection(wards);
     (MAP.shape.rivers || []).forEach(line => {
@@ -555,6 +590,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     $("labelsG").style.opacity = MAP.k >= 2.2 ? 1 : 0;
     const sx = MAP.W / Math.max($("mapSvg").getBoundingClientRect().width, 200), fs = 11.5 * sx / MAP.k;
     document.querySelectorAll("#labelsG text").forEach(t => { t.setAttribute("font-size", fs.toFixed(2)); t.setAttribute("stroke-width", (3 * sx / MAP.k).toFixed(2)); });
+    document.querySelectorAll("#repG circle").forEach(c => c.setAttribute("r", String(Number(c.dataset.r) / MAP.k)));
     document.querySelectorAll("#meG circle").forEach(c => c.setAttribute("r", String((c.classList.contains("mePulse") ? 6 : 5) / MAP.k)));
     const touch = MAP.k > 1.02 ? "none" : "pan-y";
     $("mapSvg").style.touchAction = touch; $("mapBox").style.touchAction = touch;
@@ -577,15 +613,15 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
 
   function recolor() {
     if (!MAP.shape) return;
-    const base = MAP.mode === "base", sc = MAP.scores || {};
+    const base = MAP.mode === "base", learned = MAP.mode === "learned", sc = MAP.scores || {};
     let mn = 1e9, mx = -1e9;
     if (base) Object.values(sc).forEach(r => { if (r.v !== null && r.v !== undefined) { mn = Math.min(mn, r.v); mx = Math.max(mx, r.v); } });
     MAP.paths.forEach((p, id) => {
-      const r = sc[id]; const raw = r ? (base ? r.v : r.s) : null;
+      const r = sc[id]; const raw = r ? (learned ? r.li : base ? r.v : r.s) : null;
       if (raw === null || raw === undefined) { p.style.fill = "#22313b"; return; }
       p.style.fill = ramp(base ? (raw - mn) / ((mx - mn) || 1) : raw);
     });
-    $("legCap").textContent = base ? "Built-in vulnerability (relative)" : "Risk right now";
+    $("legCap").textContent = learned ? "Report-proneness, learned (relative)" : base ? "Built-in vulnerability (relative)" : "Risk right now";
     document.querySelectorAll("#labelsG text").forEach(t => { const r = sc[t.dataset.id]; const n = r ? r.n : ""; t.textContent = n.length > 18 ? n.slice(0, 17) + "…" : n; });
   }
 
@@ -622,11 +658,28 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     rows.append(barRow("Risk index", r.s, r.s === null ? "—" : r.s.toFixed(2), r.s));
     rows.append(barRow("Waterlogging-prone terrain", r.u, r.u === null ? "—" : r.u.toFixed(2), r.u));
     rows.append(barRow("Near a river corridor", r.r, r.r === null ? "—" : r.r.toFixed(2), r.r));
+    if (r.p !== null && r.p !== undefined) rows.append(barRow("Chance of a reported local flood today", clamp(r.p / 0.5, 0, 1), r.p < 0.01 ? "under 1%" : Math.round(r.p * 100) + "%", clamp(r.p / 0.5, 0, 1)));
+    if (r.li !== null && r.li !== undefined) rows.append(barRow("Report-proneness since 2022 (learned)", r.li, topWord(r.li), r.li));
     box.append(rows);
+    const rpt = REP.wards[id];
     const f = document.createElement("div"); f.className = "prow";
     const l1 = document.createElement("span"); l1.textContent = "Rain forecast, next 24 h"; const v1 = document.createElement("strong"); v1.textContent = r.f24 === null ? "—" : r.f24.toFixed(1) + " mm";
-    const l2 = document.createElement("span"); l2.textContent = "Past flood link"; const v2 = document.createElement("strong"); v2.textContent = r.c ? "Linked to a past discharge event" : "No past link on record";
-    f.append(l1, v1, l2, v2); box.append(f);
+    const l2 = document.createElement("span"); l2.textContent = "Dam-release corridor"; const v2 = document.createElement("strong"); v2.textContent = r.c ? "Flagged by release scenario" : "Not active (no live release data)";
+    f.append(l1, v1, l2, v2);
+    if (rpt && !state.replay) {
+      const l3 = document.createElement("span"); l3.textContent = "Citizen reports, last 6 h";
+      const v3 = document.createElement("strong"); const ago = rpt.minutes_ago < 1 ? "just now" : rpt.minutes_ago < 60 ? rpt.minutes_ago + " min ago" : Math.floor(rpt.minutes_ago / 60) + " h ago";
+      v3.textContent = rpt.count + (rpt.count === 1 ? " report" : " reports") + " · " + rpt.people + (rpt.people === 1 ? " person" : " people") + " · latest " + ago;
+      f.append(l3, v3);
+    }
+    const rn = REP.rain[id];
+    if (rn && !state.replay) {
+      const l4 = document.createElement("span"); l4.textContent = "Residents report rain, last 3 h";
+      const v4 = document.createElement("strong");
+      v4.textContent = rn.count + (rn.count === 1 ? " report" : " reports") + " · up to " + RAIN_WORDS[rn.max_intensity] + " · latest " + agoText(rn.minutes_ago);
+      f.append(l4, v4);
+    }
+    box.append(f);
     panel.append(box);
   }
 
@@ -651,7 +704,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     tip.replaceChildren();
     const b = document.createElement("b"); b.textContent = r.n;
     const t = document.createElement("span");
-    t.textContent = MAP.mode === "base" ? "Built-in vulnerability: " + vulnWord(r.v) : (MAP.replay ? "Risk then: " : "Risk now: ") + levelWord(r.l, r.s) + (r.f24 !== null ? " · 24 h rain " + r.f24.toFixed(1) + " mm" : "");
+    t.textContent = MAP.mode === "learned" ? "Report-proneness: " + topWord(r.li) : MAP.mode === "base" ? "Built-in vulnerability: " + vulnWord(r.v) : (MAP.replay ? "Risk then: " : "Risk now: ") + levelWord(r.l, r.s) + (r.f24 !== null ? " · 24 h rain " + r.f24.toFixed(1) + " mm" : "");
     tip.append(b, t); tip.hidden = false;
     const box = $("mapBox").getBoundingClientRect();
     let x = e.clientX - box.left + 14, y = e.clientY - box.top + 14;
@@ -702,17 +755,79 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
       const d = await getJson("/ml/map/scores" + (date ? "?date=" + encodeURIComponent(date) : ""));
       MAP.scores = d.scores; MAP.replay = !!d.replay; MAP.note = d.note || "";
       const tag = $("mapTag"); tag.hidden = !MAP.replay; if (MAP.replay && state.replay) tag.textContent = "Replay · " + (state.replay.date ? new Date(state.replay.date + "T00:00:00").toLocaleDateString("en-IN", {day: "numeric", month: "short", year: "numeric"}) : "past day");
-      $("mapNote").textContent = (MAP.note ? MAP.note + " " : "") + "Ctrl + scroll or the + / − buttons zoom the map.";
-      recolor(); renderPanel();
+      setMapNote(); recolor(); renderPanel();
     } catch (e) {
       if (!MAP.scores) { $("mapMsg").hidden = false; $("mapMsg").textContent = "Risk colours unavailable: " + (e.message || "error"); }
     }
   }
 
+  function drawReports() {
+    const g = $("repG"); if (!g) return;
+    g.replaceChildren();
+    if (state.replay) return;
+    Object.keys(REP.wards).forEach(id => {
+      const b = MAP.bbox.get(id); if (!b) return;
+      const w = REP.wards[id], cx = ((b[0] + b[2]) / 2).toFixed(1), cy = ((b[1] + b[3]) / 2).toFixed(1), col = REP_COLORS[w.max_severity] || REP_COLORS[1], r = 15 + Math.min(w.count, 5) * 2;
+      if (w.minutes_ago <= 30) { const ring = document.createElementNS(NS, "circle"); ring.setAttribute("class", "ring"); ring.setAttribute("cx", cx); ring.setAttribute("cy", cy); ring.setAttribute("stroke", col); ring.dataset.r = String(r); g.append(ring); }
+      const pin = document.createElementNS(NS, "circle"); pin.setAttribute("class", "pin"); pin.setAttribute("cx", cx); pin.setAttribute("cy", cy); pin.setAttribute("fill", col); pin.setAttribute("fill-opacity", w.people > 1 ? "1" : "0.78"); pin.dataset.r = String(r); g.append(pin);
+    });
+    Object.keys(REP.rain).forEach(id => {
+      const b = MAP.bbox.get(id); if (!b) return;
+      const w = REP.rain[id], cx = (b[0] + (b[2] - b[0]) * 0.3).toFixed(1), cy = (b[1] + (b[3] - b[1]) * 0.3).toFixed(1), r = 9 + w.max_intensity * 3;
+      if (w.minutes_ago <= 20) { const ring = document.createElementNS(NS, "circle"); ring.setAttribute("class", "ring"); ring.setAttribute("cx", cx); ring.setAttribute("cy", cy); ring.setAttribute("stroke", "#4aa3ff"); ring.dataset.r = String(r); g.append(ring); }
+      const pin = document.createElementNS(NS, "circle"); pin.setAttribute("class", "pin"); pin.setAttribute("cx", cx); pin.setAttribute("cy", cy); pin.setAttribute("fill", "#4aa3ff"); pin.setAttribute("fill-opacity", w.people > 1 ? "1" : "0.78"); pin.dataset.r = String(r); g.append(pin);
+    });
+    applyView(false);
+  }
+
+  function renderReportBar() {
+    const n = Object.keys(REP.wards).length, m = Object.keys(REP.rain).length;
+    const parts = [];
+    if (REP.total) parts.push(REP.total + (REP.total === 1 ? " flood report" : " flood reports") + " from " + n + (n === 1 ? " ward" : " wards") + " (6 h)");
+    if (REP.rainTotal) parts.push(REP.rainTotal + (REP.rainTotal === 1 ? " rain report" : " rain reports") + " from " + m + (m === 1 ? " ward" : " wards") + " (3 h)");
+    $("repText").textContent = state.replay ? "Replay mode: live citizen reports are hidden."
+      : parts.length === 0 ? "No citizen reports right now."
+      : parts.join(" · ") + " · unverified. Red and amber dots are floods, blue dots are rain.";
+    const a = $("repLink");
+    if (REP.bot && REP.bot.link) { a.href = REP.bot.link; a.hidden = false; } else a.hidden = true;
+  }
+
+  async function loadReports() {
+    try {
+      const d = await getJson("/ml/reports");
+      REP.wards = d.wards || {}; REP.total = d.total || 0; REP.bot = d.bot || null; REP.rain = d.rain || {}; REP.rainTotal = d.rain_total || 0; REP.rainRecent = d.rain_recent || {people: 0, wards: 0};
+    } catch (e) { REP.wards = {}; REP.total = 0; REP.rain = {}; REP.rainTotal = 0; REP.rainRecent = {people: 0, wards: 0}; }
+    renderReportBar(); drawReports(); if (MAP.sel) renderPanel(); if (!state.replay) render();
+  }
+
+  const agoText = m => m < 1 ? "just now" : m < 60 ? m + " min ago" : Math.floor(m / 60) + " h ago";
+
+  function renderObs() {
+    const card = $("obsCard"), list = OBS.stations;
+    if (!list.length || state.replay) { card.hidden = true; return; }
+    card.hidden = false;
+    const rows = document.createElement("div"); rows.className = "prow";
+    list.forEach(s => rows.append(barRow(s.station, clamp(s.mm / 65, 0, 1), s.mm.toFixed(1) + " mm", clamp(s.mm / 65, 0, 1))));
+    $("obsRows").replaceChildren(rows);
+    const newest = list.reduce((m, s) => Math.min(m, s.minutes_ago), 1e9);
+    $("obsNote").textContent = (OBS.source || "IMD station data") + " · updated " + agoText(newest) + ". Bars fill up to 65 mm. Daily totals are to 8:30 am.";
+  }
+
+  async function loadObservations() {
+    try { const d = await getJson("/ml/observations"); OBS.stations = d.stations || []; OBS.source = d.source || ""; } catch (e) { OBS.stations = []; OBS.source = ""; }
+    renderObs(); if (!state.replay) render();
+  }
+
+  function setMapNote() {
+    $("mapNote").textContent = MAP.mode === "learned"
+      ? "Learned from news-reported local floods since 2022 (Google Groundsource). It reflects reporting as well as flooding, and is not an official map. Ctrl + scroll or the + / − buttons zoom the map."
+      : (MAP.note ? MAP.note + " " : "") + "Ctrl + scroll or the + / − buttons zoom the map.";
+  }
+
   function setupMap() {
     const svg = $("mapSvg"), box = $("mapBox");
     document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-      MAP.mode = b.dataset.mode; document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x === b)); recolor();
+      MAP.mode = b.dataset.mode; document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x === b)); setMapNote(); recolor();
     }));
     $("zIn").addEventListener("click", () => zoomAt(MAP.W / 2, MAP.H / 2, 1.6, true));
     $("zOut").addEventListener("click", () => zoomAt(MAP.W / 2, MAP.H / 2, 1 / 1.6, true));
@@ -765,6 +880,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
   $("replayGo").addEventListener("click", startReplay);
   $("backLive").addEventListener("click", backToLive);
   setInterval(() => { if (!state.replay && !document.hidden) refresh().catch(() => {}); }, 600000);
+  setInterval(() => { if (!state.replay && !document.hidden) loadReports(); }, 60000);
   setupReveal();
   setupMap();
   loadEvents();

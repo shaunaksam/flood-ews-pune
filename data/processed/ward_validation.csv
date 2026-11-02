@@ -1,0 +1,59 @@
+wardnum,km2,events,name,vuln,terrain,river,past_link,per_km2,combined
+1,13.0639,65,Dhanori - Vishrantwadi,0.3639,0.0165,0.0045,False,4.9755,0.408
+2,6.0485,86,Tingrenagar - Sanjay Park,0.388,0.0183,0.0049,False,14.2185,0.4828
+3,31.7369,101,Lohegaon - Vimannagar,0.3349,0.016,0.0037,False,3.1824,0.3218
+4,35.5646,65,East Kharadi - Wagholi,0.3077,0.0154,0.0017,False,1.8277,0.2471
+5,4.0911,69,West Kharadi - Vadgaon Sheri,0.3569,0.0128,0.0027,False,16.866,0.2471
+6,3.3591,64,Vadgaon Sheri - Ramwadi,0.3897,0.0137,0.0041,False,19.0529,0.3678
+7,6.8928,104,Kalyaninagar - Nagpur Chawl,0.431,0.0217,0.0059,False,15.0882,0.6149
+8,4.032,77,Kalas - Phulenagar,0.4449,0.0198,0.0065,False,19.0973,0.6437
+9,1.1509,52,Yerwada,0.4504,0.0223,0.0068,False,45.1817,0.7011
+10,7.4014,111,Shivajinagar Gaothan - Sangamwadi,0.4974,0.0241,0.0087,False,14.9971,0.9397
+11,7.1048,78,Bopodi - Savitribai Phule Pune University,0.4459,0.0195,0.0072,False,10.9784,0.6839
+12,12.2337,87,Aundh - Balewadi,0.418,0.0171,0.006,False,7.1115,0.5402
+13,20.8185,118,Baner - Sus - Mahalunge,0.3808,0.0126,0.0063,False,5.668,0.3736
+14,19.1546,60,Pashan - Bawdhan,0.3994,0.0126,0.0087,False,3.1324,0.5546
+15,4.7816,59,Gokhalenagar - Vadarwadi,0.3901,0.0126,0.0076,False,12.339,0.4598
+16,5.8059,166,Fergusson College - Erandwane,0.4814,0.0232,0.0087,False,28.5918,0.8764
+17,2.2781,85,Shaniwar peth - Navi Peth,0.4905,0.0237,0.0087,False,37.3115,0.8937
+18,1.0968,39,Shaniwarwada - Kasba Peth,0.4948,0.0239,0.0087,False,35.5585,0.9167
+19,1.0325,22,Chhatrapati Shivaji Maharaj Stadium - Rasta peth,0.4925,0.0239,0.0086,False,21.3071,0.8678
+20,4.1719,67,Pune Station -Matoshri Ramabai Ambedkar Road,0.496,0.024,0.0087,False,16.0598,0.9282
+21,8.3259,103,Koregaon park - Mundhwa,0.4689,0.0231,0.0074,False,12.371,0.7701
+22,31.3161,71,Manjari Bk. - Shewalwadi,0.3494,0.0127,0.0022,False,2.2672,0.2184
+23,7.1618,53,Sadesataranali - Aakashwani,0.3404,0.0124,0.0022,False,7.4004,0.1782
+24,5.2955,52,Magarpatta - Sadhana Vidyalaya,0.3807,0.0133,0.0041,False,9.8196,0.3161
+25,1.8463,23,Hadapsar Gaothan - Satavwadi,0.331,0.0119,0.0025,False,12.4572,0.1609
+26,4.558,73,Wanwadi Gaothan - Vaiduwadi,0.3731,0.0189,0.0048,False,16.0157,0.4655
+27,0.9434,40,Kasewadi - Lohiyanagar,0.4427,0.0217,0.0072,False,42.4007,0.6954
+29,1.2473,42,Ghorpade peth Udyan - Mahatma Phule Mandai,0.4613,0.0223,0.0081,False,33.6721,0.7759
+30,3.0956,50,Jai Bhavaninagar - Kelewadi,0.3865,0.0124,0.0078,False,16.1521,0.4368
+31,1.8426,41,Kothrud Gaothan - Shivtirthnagar,0.4185,0.0138,0.0072,False,22.2516,0.523
+32,4.554,64,Bhusari colony - Bavdhan Khurd,0.4022,0.0127,0.0087,False,14.0536,0.5402
+33,8.6032,92,Ideal colony - Mahatma Society,0.3951,0.0124,0.0087,False,10.6937,0.5374
+34,27.9468,70,Warje - Kondhave Dhavde,0.9147,0.0153,0.0218,False,2.5048,0.8218
+35,4.6804,61,Ramnagar - Uttamnagar Shivane,0.7243,0.0179,0.0153,False,13.0331,0.8592
+36,2.6271,52,Karvenagar,0.4826,0.0158,0.0087,False,19.794,0.7443
+37,1.8138,26,Janata Vasahat - Dattawadi,0.4698,0.0225,0.0087,False,14.3348,0.8534
+38,2.7423,45,Shivdarshan - Padmavati,0.439,0.0211,0.008,False,16.4097,0.7241
+39,2.7042,56,Market yard - Maharshinagar,0.4091,0.02,0.0069,False,20.7087,0.6264
+40,4.9426,65,Bibvewadi - Gangadham,0.3576,0.0179,0.0064,False,13.151,0.4713
+41,1.9532,29,Kondhva Kh - Mithanagar,0.2746,0.014,0.0044,False,14.8476,0.2586
+42,8.0736,50,Ramtekadi - Sayyadnagar,0.3069,0.0163,0.0036,False,6.193,0.2931
+43,4.1534,36,Wanawadi - Kausar Baug,0.3236,0.0163,0.0043,False,8.6677,0.3391
+44,3.5046,25,Kale Boratenagar - Sasanenagar,0.3011,0.011,0.0017,False,7.1334,0.092
+45,6.5052,26,Fursungi,0.2619,0.0101,0.0,False,3.9968,0.0575
+46,44.5728,63,Mohammad wadi - Uruli Devachi,0.238,0.0117,0.0029,False,1.4134,0.1034
+47,17.1983,38,Kondhva Bk - Yewalewadi,0.1896,0.0093,0.0038,False,2.2095,0.092
+48,1.5019,38,Upper Super Indiranagar,0.2937,0.0147,0.0053,False,25.3017,0.3046
+49,1.4924,58,Balajinagar - Shankar Maharaj Math,0.3666,0.0177,0.0065,False,38.8637,0.4943
+50,2.8637,38,Sahakarnagar - Taljai,0.3888,0.019,0.0079,False,13.2695,0.6322
+51,6.0713,46,Vadgaon Bk - Manikbaug,0.4096,0.0151,0.0085,False,7.5766,0.6034
+52,6.2265,91,Nanded City - Sun City,0.7339,0.0183,0.0153,False,14.615,0.8764
+53,28.8544,47,Khadakwasla - Narhe,0.3312,0.0115,0.0087,False,1.6289,0.4109
+54,26.2487,29,Dhayari - Ambegaon,0.2429,0.0082,0.0072,False,1.1048,0.2184
+55,3.537,44,Dhankawadi - Ambegaon Pathar,0.3635,0.0134,0.0075,False,12.4399,0.4368
+56,1.9895,45,Chaitanyanagar - Bharati Vidyapeeth,0.3026,0.0148,0.0061,False,22.6182,0.3391
+57,2.864,52,Sukhsagarnagar - Rajiv Gandhinagar,0.2719,0.0135,0.0051,False,18.1565,0.2644
+58,20.4105,58,Katraj - Gokulnagar,0.1154,0.0043,0.005,False,2.8417,0.1207
+28,0.8177,41,Mahatma Phule Smarak –Bhavani Peth,0.4634,0.0226,0.0078,False,50.1393,0.7759

@@ -1,5 +1,7 @@
+import os
 import sys
 import math
+import time
 from pathlib import Path
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -88,6 +90,59 @@ def _build_shape(mod):
     return {"available": True, "wards": wards, "rivers": rivers}
 
 
+_wm = None
+_li = None
+
+
+def _ward_bundle():
+    global _wm
+    if _wm is None:
+        p = ROOT / "models" / "ward_report_v1.joblib"
+        try:
+            import joblib
+            _wm = joblib.load(p) if p.exists() else False
+        except Exception:
+            _wm = False
+    return _wm or None
+
+
+def _learned_index():
+    global _li
+    if _li is None:
+        p = ROOT / "data" / "processed" / "ward_learned_index_v1.csv"
+        _li = {}
+        try:
+            if p.exists():
+                import pandas as pd
+                d = pd.read_csv(p)
+                _li = {str(int(r.wardnum)): float(r.learned_rank_pct) for r in d.itertuples()}
+        except Exception:
+            _li = {}
+    return _li
+
+
+def _ward_chances(rm_mm, rx_mm):
+    b = _ward_bundle()
+    if b is None:
+        return {}
+    try:
+        import numpy as np
+        import pandas as pd
+        f = pd.DataFrame(b["ward_static"])
+        f["rm"] = float(np.log1p(max(float(rm_mm), 0.0)))
+        f["rx"] = float(np.log1p(max(float(rx_mm), 0.0)))
+        f["larea"] = np.log(f["km2"].clip(lower=0.05))
+        f["y2023"] = 0
+        f["y2024"] = 0
+        f["y2025"] = 1
+        for c in ("vuln", "terrain", "river", "larea"):
+            f["rm_" + c] = f["rm"] * f[c]
+        p = b["logistic"].predict_proba(f[b["logistic_features"]].to_numpy(dtype=float))[:, 1]
+        return {str(int(w)): float(x) for w, x in zip(f["wardnum"], p)}
+    except Exception:
+        return {}
+
+
 def _scores_payload(mod, src):
     df = mod.compute_predictive_risk(src, mod.DEFAULT_CUSECS)
     out = {}
@@ -104,6 +159,20 @@ def _scores_payload(mod, src):
             "f24": _f(r.get("forecast_24h_mm")),
             "h": _f(r.get("upstream_rainfall_hazard_score")),
         }
+    try:
+        rm = float(src.get("forecast_24h_mm") or 0.0)
+        if src.get("source") == "Replay":
+            rx = float(src.get("upstream_max_forecast_24h_mm") or rm)
+        else:
+            rx = _f(df["forecast_24h_mm"].max())
+            rx = rm if rx is None else rx
+        chances = _ward_chances(rm, rx)
+        li = _learned_index()
+        for k, v in out.items():
+            v["p"] = chances.get(k)
+            v["li"] = li.get(k)
+    except Exception:
+        pass
     return out
 
 
@@ -163,3 +232,102 @@ def map_scores(date: str = ""):
     except Exception as exc:
         return JSONResponse(status_code=503, content={"available": False, "reason": f"Scores unavailable: {type(exc).__name__}"})
     return {"available": True, "replay": replay, "scores": scores, "note": note}
+
+
+_bot = {"v": None, "t": 0.0}
+
+
+def _bot_info():
+    name = os.getenv("TELEGRAM_BOT_USERNAME", "").strip().lstrip("@")
+    if not name:
+        if time.time() - _bot["t"] < 3600:
+            name = _bot["v"] or ""
+        else:
+            _bot["t"] = time.time()
+            token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+            if token:
+                try:
+                    import requests
+                    name = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=4).json().get("result", {}).get("username") or ""
+                except Exception:
+                    name = ""
+            _bot["v"] = name
+    return {"username": name, "link": f"https://t.me/{name}"} if name else None
+
+
+@router.get("/ml/reports")
+def ml_reports(hours: int = 6):
+    from datetime import datetime, timedelta, timezone
+    hours = max(1, min(int(hours), 48))
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    agg = {}
+    total = 0
+    mod = _main_module()
+    if mod is not None:
+        try:
+            from sqlalchemy import text
+            with mod.engine.connect() as c:
+                rows = c.execute(text("SELECT ward, severity, reporter, created_at FROM citizen_reports WHERE created_at >= :s"), {"s": now - timedelta(hours=hours)}).fetchall()
+            for ward, sev, who, ts in rows:
+                if isinstance(ts, str):
+                    ts = datetime.fromisoformat(ts)
+                d = agg.setdefault(str(int(ward)), {"count": 0, "people": set(), "max_severity": 0, "latest": None})
+                d["count"] += 1
+                d["people"].add(who)
+                d["max_severity"] = max(d["max_severity"], int(sev))
+                if d["latest"] is None or ts > d["latest"]:
+                    d["latest"] = ts
+                total += 1
+        except Exception:
+            agg, total = {}, 0
+    wards = {k: {"count": v["count"], "people": len(v["people"]), "max_severity": v["max_severity"], "minutes_ago": max(0, int((now - v["latest"]).total_seconds() // 60))} for k, v in agg.items()}
+    rain, rain_total, recent_people, recent_wards = {}, 0, set(), set()
+    if mod is not None:
+        try:
+            from sqlalchemy import text
+            with mod.engine.connect() as c:
+                rrows = c.execute(text("SELECT ward, intensity, reporter, created_at FROM rain_reports WHERE created_at >= :s"), {"s": now - timedelta(hours=3)}).fetchall()
+            ragg = {}
+            for ward, inten, who, ts in rrows:
+                if isinstance(ts, str):
+                    ts = datetime.fromisoformat(ts)
+                d = ragg.setdefault(str(int(ward)), {"count": 0, "people": set(), "max_intensity": 0, "latest": None})
+                d["count"] += 1
+                d["people"].add(who)
+                d["max_intensity"] = max(d["max_intensity"], int(inten))
+                if d["latest"] is None or ts > d["latest"]:
+                    d["latest"] = ts
+                rain_total += 1
+                if int(inten) >= 2 and (now - ts) <= timedelta(minutes=90):
+                    recent_people.add(who)
+                    recent_wards.add(int(ward))
+            rain = {k: {"count": v["count"], "people": len(v["people"]), "max_intensity": v["max_intensity"], "minutes_ago": max(0, int((now - v["latest"]).total_seconds() // 60))} for k, v in ragg.items()}
+        except Exception:
+            rain, rain_total, recent_people, recent_wards = {}, 0, set(), set()
+    return JSONResponse(content={"available": True, "hours": hours, "total": total, "wards": wards, "rain": rain, "rain_total": rain_total, "rain_recent": {"people": len(recent_people), "wards": len(recent_wards)}, "bot": _bot_info()}, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/ml/observations")
+def ml_observations(hours: int = 30):
+    from datetime import datetime, timedelta, timezone
+    hours = max(1, min(int(hours), 72))
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    latest = {}
+    mod = _main_module()
+    if mod is not None:
+        try:
+            from sqlalchemy import text
+            with mod.engine.connect() as c:
+                try:
+                    rows = c.execute(text("SELECT station, mm, entered_at, source FROM rain_observations WHERE entered_at >= :s ORDER BY entered_at"), {"s": now - timedelta(hours=hours)}).fetchall()
+                except Exception:
+                    rows = [tuple(r) + (None,) for r in c.execute(text("SELECT station, mm, entered_at FROM rain_observations WHERE entered_at >= :s ORDER BY entered_at"), {"s": now - timedelta(hours=hours)}).fetchall()]
+            for station, mm, ts, src in rows:
+                if isinstance(ts, str):
+                    ts = datetime.fromisoformat(ts)
+                latest[str(station)] = {"station": str(station), "mm": float(mm), "minutes_ago": max(0, int((now - ts).total_seconds() // 60)), "source": src or "IMD station data (manual entry)"}
+        except Exception:
+            latest = {}
+    stations = sorted((d for d in latest.values() if d["mm"] >= 1.0), key=lambda d: -d["mm"])
+    sources = sorted({d["source"] for d in stations})
+    return JSONResponse(content={"available": True, "stations": stations, "source": " · ".join(sources) if sources else None}, headers={"Cache-Control": "no-store"})

@@ -1,0 +1,5 @@
+model,auc,avg_precision,brier,wards_found_in_top10_pct,same_on_wet_days_pct
+M0 rain only (no ward info),0.819,0.111,0.0226,17.6,17.6
+M1 rain + hand-set vulnerability,0.819,0.113,0.0226,23.5,29.3
+M2 rain + learned weights (logistic),0.819,0.119,0.0225,30.6,30.7
+M3 rain + learned weights (boosted trees),0.816,0.085,0.0239,34.7,34.9
