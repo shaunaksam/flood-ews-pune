@@ -41,7 +41,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/flood_ews
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "8001:8001"
+      - "127.0.0.1:8001:8001"
     volumes:
       - ./data:/app/data:ro
       - ./models:/app/models:ro
@@ -66,6 +66,27 @@ services:
         condition: service_healthy
       api:
         condition: service_started
+    restart: unless-stopped
+
+  proxy:
+    image: caddy:2
+    container_name: flood_ews_proxy
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: flood_ews_tunnel
+    command: tunnel --no-autoupdate --url http://proxy:80
+    depends_on:
+      - proxy
+    profiles: ["tunnel"]
     restart: unless-stopped
 
 volumes:

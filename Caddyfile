@@ -1,0 +1,17 @@
+{
+    auto_https off
+}
+
+:80 {
+    @public path /citizen/v2 /ml/* /prediction/forecast /nowcast/imd /nowcast/imd/district-warning
+    handle @public {
+        reverse_proxy api:8001
+    }
+    handle {
+        respond "Not found" 404
+    }
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy no-referrer
+    }
+}
