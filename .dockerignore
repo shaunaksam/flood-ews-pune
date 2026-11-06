@@ -1,0 +1,20 @@
+.git
+.venv
+.env
+__pycache__
+*.pyc
+*.ipynb
+.ipynb_checkpoints
+data
+models
+docs
+backups
+notebooks
+api-node
+alerting
+radar_archive
+pune_radar_audit_*
+api/main copy.py
+api/main.py.before-*
+api/backtest_predictive_v1.py
+README.md

@@ -19,7 +19,7 @@ from fastapi import HTTPException
 
 
 app = FastAPI(title="Pune Flood EWS — Forecast, Telegram Scheduler, and IMD Nowcast Connector V2.8")
-engine = create_engine("postgresql://postgres:postgres@localhost:5432/flood_ews")
+engine = create_engine(os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/flood_ews"))
 
 THRESHOLD_CUSECS = 25000
 VERY_HEAVY_RAIN_MM = 200
