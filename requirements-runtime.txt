@@ -16,4 +16,5 @@ scikit-learn==1.9.0
 scipy==1.18.1
 joblib==1.5.3
 beautifulsoup4==4.15.0
+prometheus_client==0.26.0
 tzdata==2026.3

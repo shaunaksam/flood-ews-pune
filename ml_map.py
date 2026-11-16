@@ -331,3 +331,73 @@ def ml_observations(hours: int = 30):
     stations = sorted((d for d in latest.values() if d["mm"] >= 1.0), key=lambda d: -d["mm"])
     sources = sorted({d["source"] for d in stations})
     return JSONResponse(content={"available": True, "stations": stations, "source": " · ".join(sources) if sources else None}, headers={"Cache-Control": "no-store"})
+
+
+@router.get("/metrics")
+def metrics():
+    from datetime import datetime, timedelta, timezone
+    from prometheus_client import CollectorRegistry, Gauge, generate_latest, CONTENT_TYPE_LATEST
+    from fastapi.responses import Response
+    reg = CollectorRegistry()
+
+    def g(name, doc, value):
+        if value is not None:
+            Gauge(name, doc, registry=reg).set(float(value))
+
+    g("flood_ews_api_up", "API process is running", 1)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    mod = _main_module()
+    db_ok, flood6, rain3, subs, obs_max = 0, None, None, None, None
+    if mod is not None:
+        try:
+            from sqlalchemy import text
+            with mod.engine.connect() as c:
+                c.execute(text("SELECT 1"))
+                db_ok = 1
+                for label in ("flood6", "rain3", "subs", "obs"):
+                    try:
+                        if label == "flood6":
+                            flood6 = c.execute(text("SELECT COUNT(*) FROM citizen_reports WHERE created_at >= :s"), {"s": now - timedelta(hours=6)}).scalar()
+                        elif label == "rain3":
+                            rain3 = c.execute(text("SELECT COUNT(*) FROM rain_reports WHERE created_at >= :s"), {"s": now - timedelta(hours=3)}).scalar()
+                        elif label == "subs":
+                            subs = c.execute(text("SELECT COUNT(*) FROM tg_subscribers")).scalar()
+                        else:
+                            latest = {}
+                            for st, mm, ts in c.execute(text("SELECT station, mm, entered_at FROM rain_observations WHERE entered_at >= :s ORDER BY entered_at"), {"s": now - timedelta(hours=30)}).fetchall():
+                                latest[st] = float(mm)
+                            obs_max = max(latest.values()) if latest else 0.0
+                    except Exception:
+                        pass
+        except Exception:
+            db_ok = 0
+    g("flood_ews_db_up", "Database reachable", db_ok)
+    g("flood_ews_citizen_flood_reports_6h", "Citizen flood reports in the last 6 hours", flood6)
+    g("flood_ews_citizen_rain_reports_3h", "Citizen rain reports in the last 3 hours", rain3)
+    g("flood_ews_telegram_subscribers", "Active Telegram subscribers", subs)
+    g("flood_ews_observed_rain_max_mm", "Highest recorded 24 h rain among stations entered in the last 30 hours (mm)", obs_max)
+    redis_ok = 0
+    try:
+        import redis
+        redis.Redis.from_url(os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"), socket_timeout=2).ping()
+        redis_ok = 1
+    except Exception:
+        redis_ok = 0
+    g("flood_ews_redis_up", "Redis reachable", redis_ok)
+    try:
+        import ml_outlook
+        w = ml_outlook.get_weather(max_age=600)
+        ok = isinstance(w, dict) and not w.get("error")
+        g("flood_ews_forecast_fetch_ok", "Latest forecast fetch succeeded", 1 if ok else 0)
+        if ok:
+            g("flood_ews_forecast_age_seconds", "Age of the cached forecast in seconds", time.monotonic() - ml_outlook._wcache["t"])
+            g("flood_ews_forecast_city_24h_mm", "City average forecast rain, next 24 h (mm)", w.get("forecast_24h_mm"))
+            out = ml_outlook.compute_outlook(w)
+            if out.get("available"):
+                g("flood_ews_heavy_rain_probability", "Chance of 20 mm or more regional rain (0 to 1)", out["heavy_rain_chance"]["probability"])
+                up = out.get("upstream_heavy_rain_chance")
+                if up:
+                    g("flood_ews_upstream_heavy_rain_probability", "Chance of 64.5 mm or more in a dam-side cell (0 to 1)", up["probability"])
+    except Exception:
+        g("flood_ews_forecast_fetch_ok", "Latest forecast fetch succeeded", 0)
+    return Response(content=generate_latest(reg), media_type=CONTENT_TYPE_LATEST)
