@@ -88,6 +88,91 @@ def _line(out):
     return line
 
 
+V2_PATH = ROOT / "models" / "rain_prob_v2.joblib"
+V3_PATH = ROOT / "models" / "rain_prob_v3_circles.joblib"
+GRID = [(lat, lon) for lat in (18.25, 18.5, 18.75) for lon in (73.5, 73.75, 74.0)]
+_v2 = {"loaded": False, "bundle": None}
+_v3 = {"loaded": False, "bundle": None}
+_mm = {"t": 0.0, "v": None}
+
+
+def _load_v2():
+    if not _v2["loaded"]:
+        _v2["loaded"] = True
+        try:
+            import joblib
+            _v2["bundle"] = joblib.load(V2_PATH) if V2_PATH.exists() else None
+        except Exception:
+            _v2["bundle"] = None
+    return _v2["bundle"]
+
+
+def _load_v3():
+    if not _v3["loaded"]:
+        _v3["loaded"] = True
+        try:
+            import joblib
+            _v3["bundle"] = joblib.load(V3_PATH) if V3_PATH.exists() else None
+        except Exception:
+            _v3["bundle"] = None
+    return _v3["bundle"]
+
+
+def multimodel_features(max_age=900):
+    b = _load_v2()
+    if not b or not b.get("fits"):
+        return None
+    now = time.monotonic()
+    if _mm["v"] is not None and now - _mm["t"] < max_age:
+        return _mm["v"]
+    import numpy as np
+    import requests
+    from datetime import datetime, timezone
+    models = list(b["models_used"])
+    params = {
+        "latitude": ",".join(str(c[0]) for c in GRID), "longitude": ",".join(str(c[1]) for c in GRID),
+        "hourly": "precipitation", "models": ",".join(models), "forecast_days": 2, "timezone": "GMT",
+    }
+    r = requests.get("https://api.open-meteo.com/v1/forecast", params=params, timeout=25)
+    r.raise_for_status()
+    data = r.json()
+    data = data if isinstance(data, list) else [data]
+    if len(data) != len(GRID):
+        return None
+    start = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+    per_model = {}
+    for m in models:
+        sums = []
+        for loc in data:
+            h = loc.get("hourly") or {}
+            key = f"precipitation_{m}" if f"precipitation_{m}" in h else ("precipitation" if len(models) == 1 else None)
+            if key is None:
+                sums = None
+                break
+            idx = next((i for i, t in enumerate(h["time"]) if datetime.fromisoformat(t).replace(tzinfo=timezone.utc) >= start), None)
+            vals = [v for v in (h[key][idx: idx + 24] if idx is not None else []) if v is not None]
+            if len(vals) < 20:
+                sums = None
+                break
+            sums.append(float(sum(vals)))
+        if sums:
+            per_model[m] = sums
+    if len(per_model) < 4:
+        return None
+    loc_m = {m: float(np.mean(v)) for m, v in per_model.items()}
+    west_m = {m: float(max(v[i] for i, c in enumerate(GRID) if c[1] <= 73.55)) for m, v in per_model.items()}
+    al, aw = np.array(list(loc_m.values())), np.array(list(west_m.values()))
+    first = next(iter(per_model))
+    out = {
+        "mean_local": float(al.mean()), "max_local": float(al.max()), "std_local": float(al.std()),
+        "mean_west": float(aw.mean()), "max_west": float(aw.max()), "frac_ge10": float((al >= 10).mean()),
+        "base_local": loc_m[first], "base_west": west_m[first],
+        "n_models": len(per_model), "n_ge10": int((al >= 10).sum()), "by_model": {k: round(v, 1) for k, v in loc_m.items()},
+    }
+    _mm["t"], _mm["v"] = now, out
+    return out
+
+
 def compute_outlook(weather):
     try:
         local24 = weather.get("forecast_24h_mm")
@@ -97,10 +182,42 @@ def compute_outlook(weather):
             return {"available": False, "reason": "Forecast inputs incomplete; no estimate shown."}
         from rain_model import predict_heavy_rain_probs, model_info
         probs = predict_heavy_rain_probs(local24, upstream24)
+        info = dict(model_info())
+        info["engine"] = "v1"
+        ens = None
+        try:
+            ens = multimodel_features()
+            import numpy as np
+            # Try v3 (gauge-trained) first, fall back to v2 (grid-trained)
+            for ver, loader, label in [("v3", _load_v3, "Pune city+Haveli gauges (Maharain), 2024-2025"), ("v2", _load_v2, "IMD rainfall, 2024-2025")]:
+                b = loader()
+                if not ens or not b:
+                    continue
+                p2 = {}
+                for tname, spec in b["fits"].items():
+                    X = np.log1p(np.array([[max(float(ens.get(f, 0.0)), 0.0) for f in spec["features"]]]))
+                    p2[tname] = float(spec["model"].predict_proba(X)[0, 1])
+                key = "gauge_mean_ge_20mm" if ver == "v3" else "regional_mean_ge_20mm"
+                if key in p2:
+                    probs = {**probs, **p2, "regional_mean_ge_20mm": p2[key]}
+                    info.update({"engine": ver,
+                                 "source": f"Average of {ens['n_models']} forecast models (Open-Meteo) trained on {label}",
+                                 "trained_days": b.get("trained_days", 239),
+                                 "date_range": b.get("date_range", [])})
+                    break
+            else:
+                ens = None
+        except Exception:
+            ens = None
         p_local = probs.get("regional_mean_ge_20mm")
         if p_local is None:
             return {"available": False, "reason": "Model not available."}
-        return _package(p_local, probs.get("any_cell_ge_64_5mm"), local24, upstream24, model_info())
+        out = _package(p_local, probs.get("any_cell_ge_64_5mm"), local24, upstream24, info)
+        if info.get("engine") == "v2":
+            out["note"] = f"Learned from archived forecasts of {ens['n_models']} models compared with observed rain (about {info.get('trained_days')} days, 2024 to 2025). Estimates the chance of heavy rain, not of flooding. Not an official warning."
+        if ens:
+            out["ensemble"] = {k: ens[k] for k in ("n_models", "n_ge10", "mean_local", "by_model")}
+        return out
     except Exception as exc:
         return {"available": False, "reason": f"Estimate unavailable: {type(exc).__name__}"}
 
@@ -292,5 +409,7 @@ def citizen_v2():
 
 
 from ml_map import router as _map_router
+from storm_watch import router as _storm_router
 
 router.include_router(_map_router)
+router.include_router(_storm_router)

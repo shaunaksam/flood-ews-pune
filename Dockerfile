@@ -14,7 +14,7 @@ COPY requirements-runtime.txt .
 RUN pip install -r requirements-runtime.txt
 
 COPY api ./api
-COPY ml_outlook.py ml_map.py citizen_v2.py rain_model.py telegram_bot.py imd_reader.py ./
+COPY ml_outlook.py ml_map.py citizen_v2.py rain_model.py telegram_bot.py imd_reader.py storm_watch.py ./
 
 RUN useradd --create-home --uid 1000 app && chown -R app:app /app
 USER app

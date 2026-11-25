@@ -225,6 +225,12 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     <p class="note" id="wardNote">Ward-centre estimate, not an exact street reading.</p>
   </section>
 
+  <section class="card reveal" id="swCard" aria-live="polite">
+    <p class="eyebrow">Storm Watch · Himawari-9 satellite</p>
+    <div class="status" id="swStatus"><span class="dot" id="swDot"></span><div><p class="statusTitle" id="swTitle">Checking satellite…</p><p class="statusText" id="swText"></p></div></div>
+    <p class="note" id="swNote"></p>
+  </section>
+
   <section class="card reveal">
     <p class="eyebrow">What to do</p>
     <ul class="tips" id="tips"></ul>
@@ -404,6 +410,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     if (src && src.available) {
       if (r) rows.push(["City average forecast that day", mm(src.inputs.local_24h_mm) + " mm"]);
       rows.push(["Highest dam-side point, 24 h", mm(src.inputs.upstream_max_24h_mm) + " mm"]);
+      if (src.ensemble) { rows.push(["Forecast models averaged", String(src.ensemble.n_models)]); rows.push(["Ensemble average, next 24 h", mm(src.ensemble.mean_local) + " mm"]); rows.push(["Models showing 10 mm or more", src.ensemble.n_ge10 + " of " + src.ensemble.n_models]); }
       rows.push(["Chance: regional average 20 mm or more", src.heavy_rain_chance.percent_label]);
       if (src.upstream_heavy_rain_chance) rows.push(["Chance: any dam-side area 64.5 mm or more", src.upstream_heavy_rain_chance.percent_label]);
       const m = src.model || {};
@@ -414,7 +421,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     const t = timeOnly(input.fetched_at_local);
     if (!r && t) rows.push(["Forecast fetched", t]);
     $("techList").replaceChildren(...rows.flatMap(([k, v]) => { const dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = k; dd.textContent = v; return [dt, dd]; }));
-    $("techNote").textContent = (src && src.note ? src.note + " " : "") + "The model estimates heavy rain, not flooding, and cannot judge extreme rainfall. Thresholds are provisional.";
+    $("techNote").textContent = (src && src.note ? src.note + " " : "") + "It cannot judge extreme rainfall, and the thresholds are provisional.";
   }
 
   function render() {
@@ -475,6 +482,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
       if (!state.replay) loadMapScores();
       loadReports();
       loadObservations();
+      loadStormWatch();
       if (!state.replay) render();
     } finally { btn.disabled = false; btn.textContent = "↻ Refresh"; }
   }
@@ -512,6 +520,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
   }
 
   const OBS = {stations: [], source: ""};
+  const SW = {available: false, level: "CLEAR", slot: "", upFrac: 0, puneFrac: 0, minBT: 0, note: ""};
   const REP = {wards: {}, total: 0, bot: null, rain: {}, rainTotal: 0, rainRecent: {people: 0, wards: 0}};
   const RAIN_WORDS = {1: "light rain", 2: "steady rain", 3: "heavy downpour"};
   const REP_COLORS = {1: "#f2c14e", 2: "#f08a3c", 3: "#e5473d"};
@@ -818,6 +827,33 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
     renderObs(); if (!state.replay) render();
   }
 
+  async function loadStormWatch() {
+    try {
+      const d = await getJson("/storm/watch");
+      SW.available = !!d.available;
+      SW.level = d.level || "CLEAR";
+      SW.slot = d.slot_ist || "";
+      SW.upFrac = d.upstream_cold_frac || 0;
+      SW.puneFrac = d.pune_cold_frac || 0;
+      SW.minBT = d.pune_min_bt_K || 0;
+      SW.note = d.note || "";
+    } catch (e) { SW.available = false; SW.level = "CLEAR"; }
+    renderStormWatch();
+  }
+
+  function renderStormWatch() {
+    if (state.replay) { $("swCard").hidden = true; return; }
+    $("swCard").hidden = false;
+    if (!SW.available) { $("swDot").className = "dot"; $("swTitle").textContent = "Satellite data unavailable"; $("swText").textContent = ""; $("swNote").textContent = ""; return; }
+    const colors = {CLEAR: "good", APPROACHING: "watch", ACTIVE: "bad"};
+    const titles = {CLEAR: "No storm clouds detected near Pune", APPROACHING: "Cold cloud tops detected upstream", ACTIVE: "Deep convection over Pune"};
+    const texts = {CLEAR: "No deep convective clouds visible in the upstream region or over Pune right now.", APPROACHING: "Cold cloud tops (below −30 °C) are present upstream. This can precede heavy rain reaching Pune. Watch for updates.", ACTIVE: "Deep convective clouds are over Pune. Heavy rain may already be falling or approaching."};
+    $("swDot").className = "dot " + (colors[SW.level] || "");
+    $("swTitle").textContent = titles[SW.level] || SW.level;
+    $("swText").textContent = texts[SW.level] || "";
+    $("swNote").textContent = (SW.slot ? "Himawari-9 · " + SW.slot + " · " : "") + "Upstream cold-cloud cover: " + (SW.upFrac * 100).toFixed(1) + "% · Pune: " + (SW.puneFrac * 100).toFixed(1) + "% · Coldest pixel: " + (SW.minBT - 273.15).toFixed(0) + " °C. " + SW.note;
+  }
+
   function setMapNote() {
     $("mapNote").textContent = MAP.mode === "learned"
       ? "Learned from news-reported local floods since 2022 (Google Groundsource). It reflects reporting as well as flooding, and is not an official map. Ctrl + scroll or the + / − buttons zoom the map."
@@ -880,10 +916,12 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;font-weight:650;font-variant-
   $("replayGo").addEventListener("click", startReplay);
   $("backLive").addEventListener("click", backToLive);
   setInterval(() => { if (!state.replay && !document.hidden) refresh().catch(() => {}); }, 600000);
+  setInterval(() => { if (!state.replay && !document.hidden) loadStormWatch(); }, 600000);
   setInterval(() => { if (!state.replay && !document.hidden) loadReports(); }, 60000);
   setupReveal();
   setupMap();
   loadEvents();
+  loadStormWatch();
   render();
   refresh().catch(() => { render(); });
 })();

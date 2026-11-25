@@ -16,3 +16,10 @@ data/raw/groundsource_2026.parquet
 .env
 backups/
 *.dump
+
+data/
+models/
+*.joblib
+om_prev_runs_cache/
+himawari_cache/
+check_something.py

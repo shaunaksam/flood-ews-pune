@@ -33,6 +33,8 @@ services:
     restart: unless-stopped
 
   api:
+    tmpfs:
+    - /tmp
     build: .
     image: flood-ews:local
     container_name: flood_ews_api
